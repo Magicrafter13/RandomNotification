@@ -2,63 +2,60 @@ package com.cs455.randomnotification;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link serverConnect#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class serverConnect extends Fragment {
+    private FragmentActivity activity;
+    private ServerData data;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public serverConnect() {
-        // Required empty public constructor
+    public void notify(View view){
+        // TODO: get name of user who pinged from database
+        // This gets the device name
+        String user= Settings.System.getString(activity.getContentResolver(), "device_name");
+        String context="hahahaha you just got randomly notified";
+        // Builder object for a notification
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), "notify channel ID")
+            .setSmallIcon(R.drawable.ic_launcher_foreground) // default android icon
+            .setContentTitle(user+" notified you!")
+            .setContentText(context)
+            .setAutoCancel(true)                             // Allows for removing the notification
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(activity);
+        // Sends a notification from the manager based on the notification ID
+        notificationManager.notify(data.nextId(), builder.build());
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment BlankFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static serverConnect newInstance(String param1, String param2) {
-        serverConnect fragment = new serverConnect();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_blank, container, false);
+        View view = inflater.inflate(R.layout.fragment_blank, container, false);
+
+        activity = requireActivity();
+
+        // Set onClick method for button.
+        view.findViewById(R.id.funnyButton).setOnClickListener((buttonView) -> data.sendRequest());
+
+        return view;
+    }
+
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceStage) {
+        super.onViewCreated(view, savedInstanceStage);
+        data = new ViewModelProvider(requireActivity()).get(ServerData.class);
+        data.setNotificationListener(() -> serverConnect.this.notify(view));
     }
 }

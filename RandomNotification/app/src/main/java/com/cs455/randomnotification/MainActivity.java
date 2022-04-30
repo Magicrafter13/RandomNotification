@@ -23,9 +23,9 @@ public class MainActivity extends AppCompatActivity {
         //data = new ViewModelProvider(this).get(ServerData.class);
 
         NotificationChannel channel = new NotificationChannel(
-            "notify channel ID",
-            "server notify",
-            NotificationManager.IMPORTANCE_DEFAULT
+            "RandomNotification",
+            "Funny Notifications Haha XD",
+            NotificationManager.IMPORTANCE_HIGH
         );
         NotificationManager manager = getSystemService(NotificationManager.class);
         manager.createNotificationChannel(channel);

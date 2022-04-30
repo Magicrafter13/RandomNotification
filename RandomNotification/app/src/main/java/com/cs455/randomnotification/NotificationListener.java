@@ -4,5 +4,5 @@ public interface NotificationListener {
     /**
      * Called when a notification has been received.
      */
-    void onNotify(); // TODO: Should eventually have custom String parameter
+    void onNotify(String title, String body);
 }

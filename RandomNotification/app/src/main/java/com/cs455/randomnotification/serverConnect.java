@@ -22,18 +22,16 @@ public class serverConnect extends Fragment {
     private FragmentActivity activity;
     private ServerData data;
 
-    public void notify(View view){
+    public void sendNotification(String title, String body) {
         // TODO: get name of user who pinged from database
         // This gets the device name
-        String user= Settings.System.getString(activity.getContentResolver(), "device_name");
-        String context="hahahaha you just got randomly notified";
         // Builder object for a notification
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), "notify channel ID")
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), "RandomNotification")
             .setSmallIcon(R.drawable.ic_launcher_foreground) // default android icon
-            .setContentTitle(user+" notified you!")
-            .setContentText(context)
-            .setAutoCancel(true)                             // Allows for removing the notification
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            .setContentTitle(title)
+            .setContentText(body)
+            .setAutoCancel(true)                             // Focuses (opens) app when notification is clicked
+            .setPriority(3);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(activity);
         // Sends a notification from the manager based on the notification ID
         notificationManager.notify(data.nextId(), builder.build());
@@ -47,15 +45,17 @@ public class serverConnect extends Fragment {
 
         activity = requireActivity();
 
-        // Set onClick method for button.
-        view.findViewById(R.id.funnyButton).setOnClickListener((buttonView) -> data.sendRequest());
+        data = new ViewModelProvider(activity).get(ServerData.class);
+        data.setNotificationListener(this::sendNotification);
 
         return view;
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceStage) {
         super.onViewCreated(view, savedInstanceStage);
-        data = new ViewModelProvider(requireActivity()).get(ServerData.class);
-        data.setNotificationListener(() -> serverConnect.this.notify(view));
+
+        data.sendName(Settings.Global.getString(activity.getContentResolver(), "device_name"));
+        // Set onClick method for button.
+        view.findViewById(R.id.funnyButton).setOnClickListener((buttonView) -> data.sendRequest());
     }
 }

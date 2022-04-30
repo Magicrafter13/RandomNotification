@@ -5,6 +5,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import coms.Client;
 import coms.ClientCollector;
 
+// TODO: If a client is connected for more than say, one day, send a "heartbeat" message to them. If they don't respond,
+//  assume they have lost connection or something.
 public class Server {
 	private static final int port = 4555;
 
@@ -17,13 +19,13 @@ public class Server {
 	 */
 	public static void main(String[] args) {
 		new Server();
-		//while (true);
 	}
 
 	public Server() {
 		listener = new ClientCollector(port) {
 			public void connected(Socket sock) {
 				Client client = new Client(sock) {
+					private String name = "";
 					public void disconnected() {
 						close();
 						clients.remove(this);
@@ -32,7 +34,8 @@ public class Server {
 					}
 					public void receive(String message) {
 						System.out.println("Received:\n" + message);
-						switch (message) {
+						String[] words = message.split(" ");
+						switch (words.length == 0 ? "EMPTY" : words[0]) {
 							// Ignore blank messages just in case
 							case "":
 								break;
@@ -44,9 +47,12 @@ public class Server {
 									System.out.println("There are now " + clients.size() + " validated clients.");
 								}
 								break;
+							case "name":
+								name = message.substring(words[0].length() + 1);
+								break;
 							case "notification":
 								if (isValidated()) {
-									clients.get(random.nextInt(clients.size())).send("notification");
+									clients.get(random.nextInt(clients.size())).send(name == "" ? "notification" : "notification " + name);
 									break;
 								}
 							default:
@@ -55,7 +61,6 @@ public class Server {
 						}
 					}
 				};
-				//client.disconnect = "";
 				client.start();
 			}
 		};

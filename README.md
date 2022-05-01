@@ -8,8 +8,8 @@ Cyrus Santiago, Daniel Belousov, Garett Loghry, Griffen Agnello, Matthew Rease
 
 ### What is it?
 
-This is the app and server source code for the CS455 networking group project.
+This is the Android app and server source code for the CS455 networking group project.
 
 ### Info
 
-The app is built with Kotlin and the server is built with ...
+The app and server backend are built using Java. The app currently runs on API 30 R.

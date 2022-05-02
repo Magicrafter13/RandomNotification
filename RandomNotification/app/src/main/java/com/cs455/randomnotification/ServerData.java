@@ -19,6 +19,7 @@ public class ServerData extends ViewModel {
 
     private final LiveServerThread connection;
     private final MutableLiveData<Integer> id = new MutableLiveData<>(1);
+    private final MutableLiveData<String> name = new MutableLiveData<>();
 
     private NotificationListener listener = null;
 
@@ -26,13 +27,15 @@ public class ServerData extends ViewModel {
         Server server = new Server("matthewrease.net", 4555) {
             public void connected() {
                 listener.onNotify("Connected to server!", "Probably not important to tell you, but it's always good to keep the user informed.");
-                //connection.getValue().send("handshake");
                 send("handshake");
+                // If we have a custom name, send it to the server
+                String str = name.getValue();
+                if (str != null)
+                    send("name " + str);
             }
             public void disconnected() {
                 listener.onNotify("Lost connection to the server.", "Just press the notify button in the app, and it will try to reconnect.");
                 // TODO: notify user (with a toast if the app is focused?)
-                //System.out.println("Disconnected from server!");
             }
             public void receive(String message) {
                 //System.out.println("Server sent: " + message);
@@ -63,18 +66,17 @@ public class ServerData extends ViewModel {
         return current;
     }
 
-    public void sendName(String name) {
-        Server server = connection.getValue();
-        if (server.isAlive())
-            server.send("name " + name);
+    public void setName(String name) {
+        this.name.setValue(name);
+        connection.getValue().send("name " + name);
     }
 
     public void sendRequest() {
-        //System.out.println("Sending request to server...");
         Server server = connection.getValue();
         if (!server.isAlive()) {
             server = newServer();
             connection.setValue(server);
+            server.send("handshake"); // Make sure a handshake is in the outbox before notification is...
         }
         server.send("notification");
     }

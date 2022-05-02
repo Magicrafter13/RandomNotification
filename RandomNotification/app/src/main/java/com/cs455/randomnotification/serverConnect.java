@@ -54,7 +54,7 @@ public class serverConnect extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceStage) {
         super.onViewCreated(view, savedInstanceStage);
 
-        data.sendName(Settings.Global.getString(activity.getContentResolver(), "device_name"));
+        data.setName(Settings.Global.getString(activity.getContentResolver(), "device_name"));
         // Set onClick method for button.
         view.findViewById(R.id.funnyButton).setOnClickListener((buttonView) -> data.sendRequest());
     }

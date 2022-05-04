@@ -13,6 +13,7 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,9 +54,16 @@ public class serverConnect extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceStage) {
         super.onViewCreated(view, savedInstanceStage);
+        // set to device name initially
+        String deviceName = Settings.Global.getString(activity.getContentResolver(), "device_name");
 
-        data.setName(Settings.Global.getString(activity.getContentResolver(), "device_name"));
         // Set onClick method for button.
-        view.findViewById(R.id.funnyButton).setOnClickListener((buttonView) -> data.sendRequest());
+        view.findViewById(R.id.funnyButton).setOnClickListener((buttonView) -> {
+            EditText nametxt = view.findViewById(R.id.nameOfDevice);
+            String name = nametxt.getText().toString();
+            if (name == null || name.length() == 0) { name = deviceName; }
+            data.setName(name);
+            data.sendRequest();
+        });
     }
 }

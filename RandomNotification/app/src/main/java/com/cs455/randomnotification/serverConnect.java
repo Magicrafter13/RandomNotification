@@ -24,7 +24,7 @@ public class serverConnect extends Fragment {
     private ServerData data;
 
     public void sendNotification(String title, String body) {
-        // TODO: get name of user who pinged from database
+        // TODO: get name of user who pinged from database - Finished by daniel
         // This gets the device name
         // Builder object for a notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), "RandomNotification")

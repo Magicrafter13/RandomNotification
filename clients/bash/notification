@@ -1,0 +1,61 @@
+#!/bin/bash
+
+address=24.21.47.234
+port=4555
+
+injob=
+
+function serverIn {
+	while { >&3; } 2<>/dev/null; do
+		read -r -u 3 line
+		#echo "server: $line"
+		case "$line" in
+			handshake)
+				;;
+			notification\ *)
+				name="${line#* }"
+				if [[ -z "$name" ]]; then name="Someone"; fi
+				notify-send -u critical "$name sent you a notification!" "hahahaha you just got randomly notified"
+				;;
+			*)
+				notify-send -u critical "Server sent an unknown command." "Not much you can do about it but we figured we should let you know anyway!"
+				;;
+		esac
+	done
+}
+
+exec 3<> /dev/tcp/$address/$port
+serverIn &
+injob=$!
+
+echo "handshake" >&3
+echo "Connected to server! Type 'notify' (or nothing) and press enter to send a notification to someone. You can also type 'name <newName>' where newName is whatever you want to show yourself as when you notify someone."
+while true; do
+	read temp
+	case "$temp" in
+		quit)
+			break
+			;;
+		help)
+			if : ; then
+				echo "notify - send a notification to someone"
+				echo 'name newName - change your name'
+				echo "quit - disconnect from notification server and end program"
+			fi >&2
+			;;
+		''|notify)
+			echo "notification"
+			;;
+		name\ *)
+			echo "$temp"
+			;;
+		*)
+			echo "bad command" >&2
+			;;
+	esac
+done >&3
+
+exec 3<&- # close input connection
+exec 3>&- # close output connection
+
+kill $injob

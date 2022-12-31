@@ -1,6 +1,6 @@
 #!/bin/bash
 
-address=24.21.47.234
+address=matthewrease.net
 port=4555
 
 injob=
@@ -12,10 +12,10 @@ function serverIn {
 		case "$line" in
 			handshake)
 				;;
-			notification\ *)
+			notification|notification\ *)
 				name="${line#* }"
 				if [[ -z "$name" ]]; then name="Someone"; fi
-				notify-send -u critical "$name sent you a notification!" "hahahaha you just got randomly notified"
+				notify-send -u normal -c funny "$name sent you a notification!" "hahahaha you just got randomly notified"
 				;;
 			*)
 				notify-send -u critical "Server sent an unknown command." "Not much you can do about it but we figured we should let you know anyway!"
